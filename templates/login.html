@@ -1,33 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
 
-<div class="animate-fade" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
-    <div class="form-container"
-        style="max-width: 420px; width: 100%; padding: 0; overflow: hidden; border-top: 6px solid var(--accent-yellow); box-shadow: 0 25px 50px -12px rgba(12, 40, 86, 0.25);">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | SARA Pernambuco</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            background-image:
+                linear-gradient(rgba(248, 250, 252, 0.95), rgba(248, 250, 252, 0.95)),
+                url('https://www.pe.gov.br/wp-content/themes/governo-pe/assets/img/brasao-pe.png');
+            background-repeat: no-repeat;
+            background-position: center 80%;
+            background-attachment: fixed;
+            background-size: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
 
-        <!-- Header do Card de Login -->
-        <div style="background: var(--primary); padding: 3rem 2rem; text-align: center; position: relative;">
-            <div
-                style="width: 70px; height: 70px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+        .login-card {
+            max-width: 420px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            border-top: 6px solid var(--accent-yellow);
+            box-shadow: 0 25px 50px -12px rgba(12, 40, 86, 0.25);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .login-header {
+            background: var(--primary);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .login-logo {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-body {
+            padding: 2.5rem 2.5rem 3rem;
+        }
+
+        .color-strip {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
             </div>
-            <h2 style="color: white; margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px;">Acesso
-                Restrito</h2>
-            <p style="color: rgba(255,255,255,0.7); margin-top: 0.5rem; font-size: 0.9rem; font-weight: 500;">Sistema de
-                Agendamento SARA</p>
+            <p style="color: rgba(255,255,255,0.7); margin-top: 0.5rem; font-size: 0.9rem; font-weight: 500;">Gestão de
+                Salas</p>
 
-            <!-- Faixa Decorativa (Cores de PE) -->
-            <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; display: flex;">
+            <div class="color-strip">
                 <div style="flex: 1; background: var(--accent-yellow);"></div>
                 <div style="flex: 1; background: var(--accent-red);"></div>
                 <div style="flex: 1; background: var(--accent-green);"></div>
             </div>
         </div>
 
-        <!-- Corpo do Formulário -->
-        <div style="padding: 2.5rem 2.5rem 3rem;">
+        <div class="login-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div
+                style="padding: 1rem; border-radius: 0.75rem; background: rgba(220, 38, 38, 0.1); color: #dc2626; border: 1px solid #dc2626; margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 600; text-align: center;">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
             <form action="{{ url_for('login') }}" method="POST">
                 <div class="form-group" style="margin-bottom: 1.5rem;">
                     <label class="form-label"
@@ -42,8 +128,8 @@
                             </svg>
                         </span>
                         <input type="text" name="username" class="form-input"
-                            style="padding-left: 3.25rem; background: #f8fafc;" placeholder="Digite seu usuário"
-                            required autofocus>
+                            style="padding-left: 3.25rem; background: #f8fafc;" placeholder="Seu usuário" required
+                            autofocus>
                     </div>
                 </div>
 
@@ -60,37 +146,24 @@
                             </svg>
                         </span>
                         <input type="password" name="senha" class="form-input"
-                            style="padding-left: 3.25rem; background: #f8fafc;" placeholder="Sua senha secreta"
-                            required>
+                            style="padding-left: 3.25rem; background: #f8fafc;" placeholder="Sua senha" required>
                     </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary"
-                    style="width: 100%; padding: 1.25rem; font-size: 1.1rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(12, 40, 86, 0.3);">
+                    style="width: 100%; padding: 1.25rem; font-size: 1.1rem; border-radius: 12px;">
                     Entrar no Sistema
                 </button>
             </form>
 
             <div style="text-align: center; margin-top: 2rem;">
                 <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
-                    Está com dificuldades? <br>
-                    <a href="#" style="color: var(--primary); font-weight: 600; text-decoration: none;">Contate o
-                        suporte técnico do setor</a>
+                    Para acesso ou suporte <br>
+                    <span style="color: var(--primary); font-weight: 600;">Contate o administrador</span>
                 </p>
             </div>
         </div>
     </div>
-</div>
+</body>
 
-<style>
-    body {
-        /* Fundo mais institucional */
-        background-image:
-            linear-gradient(rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.9)),
-            url('https://www.pe.gov.br/wp-content/themes/governo-pe/assets/img/brasao-pe.png');
-        background-repeat: no-repeat;
-        background-position: center 80%;
-        background-attachment: fixed;
-        background-size: 400px;
-    }
-</style>
+</html>
