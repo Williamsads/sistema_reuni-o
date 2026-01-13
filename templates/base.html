@@ -3,8 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SARA | Premium Booking</title>
+    <title>{% block title %}SARA | Governo de Pernambuco{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,9 +23,10 @@
                 </svg>
             </div>
             <div style="display: flex; flex-direction: column; line-height: 1;">
-                <span style="font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;">SARA</span>
+                <span style="font-size: 1.35rem; font-weight: 800; color: white; letter-spacing: -0.5px;">SARA</span>
                 <span
-                    style="font-size: 0.65rem; font-weight: 600; text-transform: uppercase; color: var(--accent-yellow); letter-spacing: 1px;">Pernambuco</span>
+                    style="font-size: 0.65rem; font-weight: 600; text-transform: uppercase; color: var(--accent-yellow); letter-spacing: 1px;">Gestão
+                    de Salas</span>
             </div>
         </a>
         <div class="nav-links">

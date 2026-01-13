@@ -1,29 +1,96 @@
-{% extends "base.html" %}
 
-{% block content %}
-<div style="text-align: center; margin-bottom: 3rem;">
-    <h1>Acesso ao Sistema</h1>
-    <p class="subtitle">Faça login para gerenciar as salas de reunião.</p>
-</div>
+<div class="animate-fade" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="form-container"
+        style="max-width: 420px; width: 100%; padding: 0; overflow: hidden; border-top: 6px solid var(--accent-yellow); box-shadow: 0 25px 50px -12px rgba(12, 40, 86, 0.25);">
 
-<div class="form-container" style="max-width: 450px;">
-    <form action="{{ url_for('login') }}" method="POST">
-        <div class="form-group">
-            <label class="form-label">Usuário</label>
-            <input type="text" name="username" class="form-input" placeholder="Seu usuário" required autofocus>
+        <!-- Header do Card de Login -->
+        <div style="background: var(--primary); padding: 3rem 2rem; text-align: center; position: relative;">
+            <div
+                style="width: 70px; height: 70px; background: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </div>
+            <h2 style="color: white; margin: 0; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px;">Acesso
+                Restrito</h2>
+            <p style="color: rgba(255,255,255,0.7); margin-top: 0.5rem; font-size: 0.9rem; font-weight: 500;">Sistema de
+                Agendamento SARA</p>
+
+            <!-- Faixa Decorativa (Cores de PE) -->
+            <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; display: flex;">
+                <div style="flex: 1; background: var(--accent-yellow);"></div>
+                <div style="flex: 1; background: var(--accent-red);"></div>
+                <div style="flex: 1; background: var(--accent-green);"></div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label class="form-label">Senha</label>
-            <input type="password" name="senha" class="form-input" placeholder="Sua senha" required>
+        <!-- Corpo do Formulário -->
+        <div style="padding: 2.5rem 2.5rem 3rem;">
+            <form action="{{ url_for('login') }}" method="POST">
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label class="form-label"
+                        style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Usuário</label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </span>
+                        <input type="text" name="username" class="form-input"
+                            style="padding-left: 3.25rem; background: #f8fafc;" placeholder="Digite seu usuário"
+                            required autofocus>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label class="form-label"
+                        style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Senha</label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </span>
+                        <input type="password" name="senha" class="form-input"
+                            style="padding-left: 3.25rem; background: #f8fafc;" placeholder="Sua senha secreta"
+                            required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; padding: 1.25rem; font-size: 1.1rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(12, 40, 86, 0.3);">
+                    Entrar no Sistema
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                    Está com dificuldades? <br>
+                    <a href="#" style="color: var(--primary); font-weight: 600; text-decoration: none;">Contate o
+                        suporte técnico do setor</a>
+                </p>
+            </div>
         </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Entrar</button>
-    </form>
-
-    <div
-        style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); text-align: center; font-size: 0.85rem; color: var(--text-muted);">
-        Acesso restrito a funcionários autorizados.
     </div>
 </div>
-{% endblock %}
+
+<style>
+    body {
+        /* Fundo mais institucional */
+        background-image:
+            linear-gradient(rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.9)),
+            url('https://www.pe.gov.br/wp-content/themes/governo-pe/assets/img/brasao-pe.png');
+        background-repeat: no-repeat;
+        background-position: center 80%;
+        background-attachment: fixed;
+        background-size: 400px;
+    }
+</style>
