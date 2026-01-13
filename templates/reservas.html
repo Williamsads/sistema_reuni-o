@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 4rem;">
+    <h1>Histórico de Reservas</h1>
+    <p class="subtitle">Acompanhe todos os agendamentos realizados para as salas 18-24.</p>
+</div>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>SALA</th>
+                <th>ASSUNTO</th>
+                <th>SOLICITANTE</th>
+                <th>DATA</th>
+                <th>HORÁRIO</th>
+                <th style="text-align: right;">AÇÕES</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reserva in reservas %}
+            <tr>
+                <td><strong style="color: var(--primary);">{{ reserva.sala.nome }}</strong></td>
+                <td>{{ reserva.assunto }}</td>
+                <td>
+                    <div style="font-weight: 500;">{{ reserva.nome_solicitante }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ reserva.setor }} - {{ reserva.telefone
+                        }}</div>
+                </td>
+                <td>{{ reserva.data.strftime('%d/%m/%Y') }}</td>
+                <td>
+                    <span
+                        style="background: rgba(255,255,255,0.05); padding: 0.25rem 0.6rem; border-radius: 0.5rem; font-size: 0.9rem;">
+                        {{ reserva.hora_inicio.strftime('%H:%M') }} — {{ reserva.hora_fim.strftime('%H:%M') }}
+                    </span>
+                </td>
+                <td style="text-align: right;">
+                    <a href="{{ url_for('cancelar_reserva', id=reserva.id) }}" class="cancel-btn"
+                        onclick="return confirm('Confirmar cancelamento da reserva?')">
+                        Cancelar
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 4rem; color: var(--text-muted);">
+                    Nenhum agendamento encontrado no momento.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top: 3rem; text-align: center;">
+    <a href="{{ url_for('reservar') }}" class="btn btn-primary" style="display: inline-flex; width: auto;">
+        Novo Agendamento
+    </a>
+</div>
+{% endblock %}

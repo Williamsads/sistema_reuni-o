@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 3rem;">
+    <h1>Agendar Reunião</h1>
+    <p class="subtitle">Garanta seu espaço com apenas alguns cliques.</p>
+</div>
+
+<div class="form-container">
+    <form action="{{ url_for('reservar') }}" method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="form-group">
+                <label class="form-label">Sala</label>
+                <select name="sala_id" class="form-input" required>
+                    {% for sala in salas %}
+                    <option value="{{ sala.id }}" {% if request.args.get('sala_id')|int==sala.id %}selected{% endif %}>
+                        {{ sala.nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Data</label>
+                <input type="date" name="data" id="data_form" class="form-input" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Assunto</label>
+            <input type="text" name="assunto" class="form-input" placeholder="Ex: Reunião de Alinhamento" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Responsável</label>
+            <input type="text" name="nome_solicitante" class="form-input" placeholder="Seu nome completo" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="form-group">
+                <label class="form-label">Setor</label>
+                <input type="text" name="setor" class="form-input" placeholder="Ex: TI" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Telefone / Ramal</label>
+                <input type="text" name="telefone" class="form-input" placeholder="(00) 00000-0000" required>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+            <div class="form-group">
+                <label class="form-label">Início</label>
+                <input type="time" name="hora_inicio" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Término</label>
+                <input type="time" name="hora_fim" class="form-input" required>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 2;">Confirmar Reserva</button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-ghost" style="flex: 1;">Voltar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('data_form').valueAsDate = new Date();
+</script>
+{% endblock %}

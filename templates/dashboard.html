@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 4rem;">
+    <h1>Painel de Disponibilidade</h1>
+    <p class="subtitle">Gestão em tempo real das salas 18 a 24 situadas no 4º andar.</p>
+</div>
+
+<div class="rooms-grid">
+    {% for item in status_salas %}
+    <div class="room-card {{ 'busy' if item.ocupada else 'free' }}">
+        <div class="room-header">
+            <div>
+                <span class="room-number">{{ item.info.nome }}</span>
+                <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">4º Andar</div>
+            </div>
+            <span class="badge {{ 'badge-busy' if item.ocupada else 'badge-free' }}">
+                {{ 'Ocupada' if item.ocupada else 'Livre' }}
+            </span>
+        </div>
+
+        <div class="room-details">
+            {% if item.ocupada %}
+            <div class="detail-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Até <strong>{{ item.reserva_atual.hora_fim.strftime('%H:%M') }}</strong></span>
+            </div>
+            <div class="detail-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>{{ item.reserva_atual.nome_solicitante }}</span>
+            </div>
+            <div class="detail-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>{{ item.reserva_atual.assunto }}</span>
+            </div>
+            {% else %}
+            <div style="color: var(--success); font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Disponível para uso
+            </div>
+            {% endif %}
+        </div>
+
+        <a href="{{ url_for('reservar', sala_id=item.info.id) }}"
+            class="btn {{ 'btn-ghost' if item.ocupada else 'btn-primary' }}"
+            style="width: 100%; border-radius: 0.75rem; padding: 0.75rem;">
+            Reservar Sala
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

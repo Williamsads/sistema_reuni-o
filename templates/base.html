@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SARA | Premium Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') }}" class="navbar-brand">
+            <div
+                style="width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #ec4899); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path>
+                    <path d="M3 21h18"></path>
+                    <path d="M9 7h1"></path>
+                    <path d="M9 11h1"></path>
+                    <path d="M9 15h1"></path>
+                    <path d="M14 7h1"></path>
+                    <path d="M14 11h1"></path>
+                    <path d="M14 15h1"></path>
+                </svg>
+            </div>
+            SARA
+        </a>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">Dashboard</a>
+            <a href="{{ url_for('reservar') }}" class="{{ 'active' if request.endpoint == 'reservar' }}">Nova
+                Reserva</a>
+            <a href="{{ url_for('lista_reservas') }}"
+                class="{{ 'active' if request.endpoint == 'lista_reservas' }}">Agendamentos</a>
+        </div>
+    </nav>
+
+    <div class="container animate-fade">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="margin-bottom: 2rem;">
+            {% for category, message in messages %}
+            <div
+                style="padding: 1rem 1.5rem; border-radius: 1rem; background: {{ 'rgba(16, 185, 129, 0.1)' if category == 'success' else 'rgba(239, 68, 68, 0.1)' }}; border: 1px solid {{ 'var(--success)' if category == 'success' else 'var(--danger)' }}; color: {{ 'var(--success)' if category == 'success' else 'var(--danger)' }}; margin-bottom: 0.75rem; font-weight: 500;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Smooth fade in for flash messages
+        setTimeout(() => {
+            const flashes = document.querySelectorAll('.flash-messages');
+            flashes.forEach(f => {
+                f.style.opacity = '0';
+                f.style.transition = 'opacity 0.5s';
+                setTimeout(() => f.remove(), 500);
+            });
+        }, 4000);
+    </script>
+</body>
+
+</html>
