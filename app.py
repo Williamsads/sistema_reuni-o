@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from models import db, Sala, Reserva
+from models import db, Sala, Reserva, Usuario
 from datetime import datetime
 from sqlalchemy import or_, and_
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import os
 
 app = Flask(__name__)
@@ -12,10 +13,17 @@ if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL or 'sqlite:///reservas.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-123')
 
 db.init_app(app)
+
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(int(user_id))
 
 def init_db():
     with app.app_context():
@@ -26,12 +34,38 @@ def init_db():
             if not Sala.query.filter_by(nome=nome).first():
                 nova_sala = Sala(nome=nome, andar="4º Andar")
                 db.session.add(nova_sala)
+        
+        # Criar usuário admin padrão se não houver usuários
+        if not Usuario.query.first():
+            admin = Usuario(username="admin")
+            admin.set_senha("admin")
+            db.session.add(admin)
+        
         db.session.commit()
 
 # Inicializa o banco ao carregar o app
 init_db()
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        senha = request.form.get('senha')
+        user = Usuario.query.filter_by(username=username).first()
+        if user and user.check_senha(senha):
+            login_user(user)
+            return redirect(url_for('dashboard'))
+        flash('Usuário ou senha inválidos.', 'error')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route('/')
+@login_required
 def dashboard():
     salas = Sala.query.all()
     hoje = datetime.now().date()
@@ -56,6 +90,7 @@ def dashboard():
     return render_template('dashboard.html', status_salas=status_salas)
 
 @app.route('/reservar', methods=['GET', 'POST'])
+@login_required
 def reservar():
     salas = Sala.query.all()
     if request.method == 'POST':
@@ -114,17 +149,55 @@ def reservar():
     return render_template('reservar.html', salas=salas)
 
 @app.route('/reservas')
+@login_required
 def lista_reservas():
     reservas = Reserva.query.order_by(Reserva.data.desc(), Reserva.hora_inicio.asc()).all()
     return render_template('reservas.html', reservas=reservas)
 
 @app.route('/cancelar/<int:id>')
+@login_required
 def cancelar_reserva(id):
     reserva = Reserva.query.get_or_404(id)
     db.session.delete(reserva)
     db.session.commit()
     flash('Reserva cancelada com sucesso.', 'success')
     return redirect(url_for('lista_reservas'))
+
+@app.route('/usuarios', methods=['GET', 'POST'])
+@login_required
+def gerenciar_usuarios():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        senha = request.form.get('senha')
+        if Usuario.query.filter_by(username=username).first():
+            flash('Este usuário já existe.', 'error')
+        else:
+            novo_usuario = Usuario(username=username)
+            novo_usuario.set_senha(senha)
+            db.session.add(novo_usuario)
+            db.session.commit()
+            flash('Usuário criado com sucesso!', 'success')
+        return redirect(url_for('gerenciar_usuarios'))
+    
+    usuarios = Usuario.query.all()
+    return render_template('usuarios.html', usuarios=usuarios)
+
+@app.route('/usuarios/excluir/<int:id>')
+@login_required
+def excluir_usuario(id):
+    if Usuario.query.count() <= 1:
+        flash('Não é possível excluir o único usuário do sistema.', 'error')
+        return redirect(url_for('gerenciar_usuarios'))
+    
+    usuario = Usuario.query.get_or_404(id)
+    if usuario.id == current_user.id:
+        flash('Você não pode excluir o usuário que está logado atualmente.', 'error')
+        return redirect(url_for('gerenciar_usuarios'))
+
+    db.session.delete(usuario)
+    db.session.commit()
+    flash('Usuário excluído com sucesso.', 'success')
+    return redirect(url_for('gerenciar_usuarios'))
 
 if __name__ == '__main__':
     init_db()

@@ -32,11 +32,18 @@
             SARA
         </a>
         <div class="nav-links">
+            {% if current_user.is_authenticated %}
             <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">Dashboard</a>
             <a href="{{ url_for('reservar') }}" class="{{ 'active' if request.endpoint == 'reservar' }}">Nova
                 Reserva</a>
             <a href="{{ url_for('lista_reservas') }}"
                 class="{{ 'active' if request.endpoint == 'lista_reservas' }}">Agendamentos</a>
+            <a href="{{ url_for('gerenciar_usuarios') }}"
+                class="{{ 'active' if request.endpoint == 'gerenciar_usuarios' }}">Usuários</a>
+            <a href="{{ url_for('logout') }}" style="color: #ffcccc; margin-left: 1rem;">Sair</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="{{ 'active' if request.endpoint == 'login' }}">Entrar</a>
+            {% endif %}
         </div>
     </nav>
 
