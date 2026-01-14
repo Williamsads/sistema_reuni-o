@@ -7,8 +7,12 @@ import pytz
 db = SQLAlchemy()
 
 def get_now_br():
-    """Retorna o datetime atual no fuso horário de Brasília/Recife."""
+    """Retorna o datetime atual no fuso horário de Brasília/Recife (com info de fuso)."""
     return datetime.now(pytz.timezone('America/Recife'))
+
+def get_now_br_naive():
+    """Retorna o datetime atual no fuso horário de Brasília/Recife (apenas wall-clock)."""
+    return get_now_br().replace(tzinfo=None)
 
 class Usuario(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +47,7 @@ class Reserva(db.Model):
     telefone = db.Column(db.String(20), nullable=False)
     inicio = db.Column(db.DateTime, nullable=False)
     fim = db.Column(db.DateTime, nullable=False)
-    data_criacao = db.Column(db.DateTime, default=get_now_br)
+    data_criacao = db.Column(db.DateTime, default=get_now_br_naive)
 
     def __repr__(self):
         return f'<Reserva {self.assunto} em {self.inicio}>'

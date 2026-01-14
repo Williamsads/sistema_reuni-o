@@ -28,8 +28,12 @@ def load_user(user_id):
     return Usuario.query.get(int(user_id))
 
 def get_now_br():
-    """Retorna o datetime atual no fuso horário de Brasília/Recife."""
+    """Retorna o datetime atual no fuso horário de Brasília/Recife (com info de fuso)."""
     return datetime.now(pytz.timezone('America/Recife'))
+
+def get_now_br_naive():
+    """Retorna o datetime atual no fuso horário de Brasília/Recife (sem info de fuso, apenas wall-clock)."""
+    return get_now_br().replace(tzinfo=None)
 
 def admin_required(f):
     @wraps(f)
@@ -83,12 +87,12 @@ def logout():
 @login_required
 def dashboard():
     salas = Sala.query.order_by(Sala.ordem).all()
-    agora = get_now_br()
+    agora = get_now_br_naive()
     
     status_salas = []
     for sala in salas:
         # Verifica se há reserva acontecendo NESTE MOMENTO
-        # inicio <= agora <= fim
+        # inicio <= agora <= fim (comparando naive com naive de Brasília)
         reserva_atual = Reserva.query.filter(
             Reserva.sala_id == sala.id,
             Reserva.inicio <= agora,
@@ -125,21 +129,25 @@ def reservar():
             hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
             hora_fim = datetime.strptime(hora_fim_str, '%H:%M').time()
 
-            # Combina data e hora (assume fuso de Recife para a entrada)
+            # Combina data e hora e força o fuso de Recife
             fuso = pytz.timezone('America/Recife')
             inicio_dt = fuso.localize(datetime.combine(data_base, hora_inicio))
             fim_dt = fuso.localize(datetime.combine(data_base, hora_fim))
+            
+            # Garantir que salvamos no banco sem fuso (naive), mas no horário de Brasília/Recife
+            # Assim o valor no banco será ex: 10:25 mesmo que o servidor esteja em UTC.
+            inicio_naive = inicio_dt.replace(tzinfo=None)
+            fim_naive = fim_dt.replace(tzinfo=None)
 
             # Lógica para "virada de noite": se fim <= inicio, assume dia seguinte
             if fim_dt <= inicio_dt:
                 fim_dt += timedelta(days=1)
 
-            # Validação de sobreposição
-            # (StartA < EndB) and (EndA > StartB)
+            # Validação de sobreposição usando os horários normalizados
             conflito = Reserva.query.filter(
                 Reserva.sala_id == sala_id,
-                Reserva.inicio < fim_dt,
-                Reserva.fim > inicio_dt
+                Reserva.inicio < fim_naive,
+                Reserva.fim > inicio_naive
             ).first()
 
             if conflito:
@@ -153,8 +161,8 @@ def reservar():
                 nome_solicitante=nome_solicitante,
                 setor=setor,
                 telefone=telefone,
-                inicio=inicio_dt,
-                fim=fim_dt
+                inicio=inicio_naive,
+                fim=fim_naive
             )
             db.session.add(nova_reserva)
             db.session.commit()
@@ -195,7 +203,7 @@ def lista_reservas():
 
     # Filtro de Status
     status = request.args.get('status')
-    agora = get_now_br()
+    agora = get_now_br_naive()
     
     if status == 'agora':
         query = query.filter(Reserva.inicio <= agora, Reserva.fim >= agora)
@@ -209,7 +217,7 @@ def lista_reservas():
     
     # Dados para o filtro
     salas = Sala.query.order_by(Sala.nome).all()
-    agora = get_now_br()
+    agora_exibicao = get_now_br() # Para exibição no template podemos usar com fuso se precisar, mas naive resolve local
     
     return render_template('reservas.html', reservas=reservas, salas=salas, agora=agora)
 
