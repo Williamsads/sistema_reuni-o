@@ -289,9 +289,9 @@ def cancelar_reserva(id):
     db.session.commit()
     return redirect(url_for('lista_reservas'))
 
-@app.route('/alterar-senha', methods=['GET', 'POST'])
+@app.route('/perfil', methods=['GET', 'POST'])
 @login_required
-def alterar_senha():
+def perfil():
     if request.method == 'POST':
         senha_atual = request.form.get('senha_atual')
         nova_senha = request.form.get('nova_senha')
@@ -306,10 +306,10 @@ def alterar_senha():
         else:
             current_user.set_senha(nova_senha)
             db.session.commit()
-            flash('Senha alterada com sucesso!', 'success')
-            return redirect(url_for('dashboard'))
+            flash('Perfil atualizado e senha alterada com sucesso!', 'success')
+            return redirect(url_for('perfil'))
             
-    return render_template('alterar_senha.html')
+    return render_template('perfil.html')
 
 @app.route('/usuarios', methods=['GET', 'POST'])
 @login_required

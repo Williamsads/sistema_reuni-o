@@ -138,14 +138,14 @@
                     Usuários
                 </a>
                 {% endif %}
-                <a href="{{ url_for('alterar_senha') }}"
-                    class="flex items-center gap-2 text-white/80 text-sm font-semibold hover:text-accent-yellow transition-colors relative py-1 {{ 'text-accent-yellow border-b-2 border-accent-yellow' if request.endpoint == 'alterar_senha' }}">
+                <a href="{{ url_for('perfil') }}"
+                    class="flex items-center gap-2 text-white/80 text-sm font-semibold hover:text-accent-yellow transition-colors relative py-1 {{ 'text-accent-yellow border-b-2 border-accent-yellow' if request.endpoint == 'perfil' }}">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.778-7.778z"></path>
-                        <path d="M12 12l.93-2.07 2.07-.93-2.07-.93L12 6l-.93 2.07-2.07.93 2.07.93L12 12z"></path>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                    Senha
+                    Meu Perfil
                 </a>
                 <a href="{{ url_for('logout') }}"
                     class="flex items-center gap-2 text-red-200 ml-4 text-sm font-semibold hover:text-red-100 transition-colors">
@@ -260,6 +260,15 @@
                 {% endif %}
 
                 <div class="pt-4 mt-auto border-t border-white/10">
+                    <a href="{{ url_for('perfil') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/5 hover:text-white transition-all {{ 'bg-accent-yellow !text-primary font-bold' if request.endpoint == 'perfil' }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Meu Perfil
+                    </a>
                     <a href="{{ url_for('logout') }}"
                         class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-300 hover:bg-red-500/10 hover:text-red-200 transition-all">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
