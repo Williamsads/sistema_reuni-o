@@ -22,6 +22,7 @@
             </h3>
 
             <form action="{{ url_for('admin.gerenciar_salas') }}" method="POST" class="space-y-6">
+                <input type="hidden" name="action" value="create">
                 <div class="space-y-2">
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Nome da Sala</label>
                     <input type="text" name="nome"
@@ -95,18 +96,24 @@
                                     sala.andar }}</span>
                             </td>
                             <td class="py-4 px-6 text-right">
-                                <a href="{{ url_for('excluir_sala', id=sala.id) }}"
-                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
-                                    onclick="return confirm('Tem certeza que deseja excluir a {{ sala.nome }}? Se houver reservas futuras, elas podem ficar órfãs.')">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path
-                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                        </path>
-                                    </svg>
-                                    Excluir
-                                </a>
+                                <form action="{{ url_for('admin.gerenciar_salas') }}" method="POST"
+                                    style="display: inline;"
+                                    onsubmit="return confirm('Tem certeza que deseja excluir a {{ sala.nome }}? Se houver reservas futuras, elas podem ficar órfãs.')">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="sala_id" value="{{ sala.id }}">
+                                    <button type="submit"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-colors border-0 cursor-pointer">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path
+                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                            </path>
+                                        </svg>
+                                        Excluir
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -130,7 +137,7 @@
                 onEnd: function () {
                     const ids = Array.from(el.querySelectorAll('tr')).map(tr => tr.dataset.id);
 
-                    fetch('{{ url_for("reordenar_salas") }}', {
+                    fetch('{{ url_for("admin.reordenar_salas") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
