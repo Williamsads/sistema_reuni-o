@@ -85,6 +85,37 @@
             </div>
         </div>
 
+        <!-- Seção de Recorrência -->
+        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 space-y-4">
+            <h4 class="text-sm font-bold text-primary flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Repetição de Agendamento
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Frequência</label>
+                    <select name="tipo_recorrencia" id="tipo_recorrencia"
+                        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-slate-700 font-medium appearance-none">
+                        <option value="nenhuma">Não repetir</option>
+                        <option value="semanal">Semanalmente (Mesmo dia da semana)</option>
+                        <option value="quinzenal">Quinzenalmente</option>
+                    </select>
+                </div>
+                <div id="qtd_repeticoes_container" class="space-y-2 hidden">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Número de
+                        Ocorrências</label>
+                    <input type="number" name="qtd_repeticoes" min="1" max="12" value="2"
+                        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-slate-700 font-medium">
+                    <p class="text-[0.7rem] text-slate-400 mt-1">* Máximo de 12 repetições para evitar sobrecarga.</p>
+                </div>
+            </div>
+        </div>
+
         <div class="flex flex-col md:flex-row gap-4 pt-4">
             <button type="submit"
                 class="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-[#1e3a8a] text-white font-bold py-4 rounded-xl transition-all hover:-translate-y-1 shadow-xl shadow-primary/20">
@@ -109,10 +140,21 @@
 </div>
 
 <script>
+    // Configura data mínima como hoje
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     document.getElementById('data_form').value = `${year}-${month}-${day}`;
+
+    // Lógica para mostrar/esconder campo de repetição
+    document.getElementById('tipo_recorrencia').addEventListener('change', function () {
+        const container = document.getElementById('qtd_repeticoes_container');
+        if (this.value !== 'nenhuma') {
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+        }
+    });
 </script>
 {% endblock %}

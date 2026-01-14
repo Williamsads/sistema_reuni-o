@@ -48,6 +48,10 @@ class Reserva(db.Model):
     inicio = db.Column(db.DateTime, nullable=False)
     fim = db.Column(db.DateTime, nullable=False)
     data_criacao = db.Column(db.DateTime, default=get_now_br_naive)
+    
+    # Campos para Recorrência
+    recorrencia_id = db.Column(db.String(50), nullable=True) # UUID para agrupar séries
+    is_recorrente = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f'<Reserva {self.assunto} em {self.inicio}>'

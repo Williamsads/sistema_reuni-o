@@ -6,6 +6,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from functools import wraps
 import os
 import pytz
+import uuid
 
 app = Flask(__name__)
 
@@ -129,45 +130,77 @@ def reservar():
             hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
             hora_fim = datetime.strptime(hora_fim_str, '%H:%M').time()
 
-            # Combina data e hora e força o fuso de Recife
-            fuso = pytz.timezone('America/Recife')
-            inicio_dt = fuso.localize(datetime.combine(data_base, hora_inicio))
-            fim_dt = fuso.localize(datetime.combine(data_base, hora_fim))
+            # Recorrência
+            tipo_recorrencia = request.form.get('tipo_recorrencia', 'nenhuma')
+            qtd_repeticoes = int(request.form.get('qtd_repeticoes', 1)) if tipo_recorrencia != 'nenhuma' else 1
             
-            # Garantir que salvamos no banco sem fuso (naive), mas no horário de Brasília/Recife
-            # Assim o valor no banco será ex: 10:25 mesmo que o servidor esteja em UTC.
-            inicio_naive = inicio_dt.replace(tzinfo=None)
-            fim_naive = fim_dt.replace(tzinfo=None)
+            # Limitar repetições para evitar abuso (máximo 12 semanas/ocorrências)
+            if qtd_repeticoes > 12: qtd_repeticoes = 12
 
-            # Lógica para "virada de noite": se fim <= inicio, assume dia seguinte
-            if fim_dt <= inicio_dt:
-                fim_dt += timedelta(days=1)
+            fuso = pytz.timezone('America/Recife')
+            series_id = str(uuid.uuid4()) if tipo_recorrencia != 'nenhuma' else None
+            
+            reservas_para_criar = []
+            conflitos = []
 
-            # Validação de sobreposição usando os horários normalizados
-            conflito = Reserva.query.filter(
-                Reserva.sala_id == sala_id,
-                Reserva.inicio < fim_naive,
-                Reserva.fim > inicio_naive
-            ).first()
+            for i in range(qtd_repeticoes):
+                delta_days = 0
+                if tipo_recorrencia == 'semanal': delta_days = i * 7
+                elif tipo_recorrencia == 'quinzenal': delta_days = i * 14
+                
+                nova_data = data_base + timedelta(days=delta_days)
+                
+                inicio_dt = fuso.localize(datetime.combine(nova_data, hora_inicio))
+                fim_dt = fuso.localize(datetime.combine(nova_data, hora_fim))
+                
+                if fim_dt <= inicio_dt:
+                    fim_dt += timedelta(days=1)
 
-            if conflito:
-                flash(f'Conflito de horário! Já existe uma reserva de {conflito.inicio.strftime("%d/%m %H:%M")} até {conflito.fim.strftime("%H:%M")}.', 'error')
-                return redirect(url_for('reservar'))
+                inicio_naive = inicio_dt.replace(tzinfo=None)
+                fim_naive = fim_dt.replace(tzinfo=None)
 
-            nova_reserva = Reserva(
-                sala_id=sala_id,
-                user_id=current_user.id,
-                assunto=assunto,
-                nome_solicitante=nome_solicitante,
-                setor=setor,
-                telefone=telefone,
-                inicio=inicio_naive,
-                fim=fim_naive
-            )
-            db.session.add(nova_reserva)
+                # Validação de sobreposição
+                conflito = Reserva.query.filter(
+                    Reserva.sala_id == sala_id,
+                    Reserva.inicio < fim_naive,
+                    Reserva.fim > inicio_naive
+                ).first()
+
+                if conflito:
+                    conflitos.append(f"{nova_data.strftime('%d/%m')}")
+                else:
+                    nova_reserva = Reserva(
+                        sala_id=sala_id,
+                        user_id=current_user.id,
+                        assunto=assunto,
+                        nome_solicitante=nome_solicitante,
+                        setor=setor,
+                        telefone=telefone,
+                        inicio=inicio_naive,
+                        fim=fim_naive,
+                        recorrencia_id=series_id,
+                        is_recorrente=(tipo_recorrencia != 'nenhuma')
+                    )
+                    reservas_para_criar.append(nova_reserva)
+
+            if conflitos:
+                if len(reservas_para_criar) == 0:
+                    flash(f'Erro: Todos os horários selecionados possuem conflitos: {", ".join(conflitos)}', 'error')
+                    return redirect(url_for('reservar'))
+                else:
+                    flash(f'Algumas reservas foram criadas, mas as seguintes datas tiveram conflitos e foram puladas: {", ".join(conflitos)}', 'warning')
+            
+            for r in reservas_para_criar:
+                db.session.add(r)
+            
             db.session.commit()
-            flash('Reserva realizada com sucesso!', 'success')
+            flash(f'{len(reservas_para_criar)} reserva(s) realizada(s) com sucesso!', 'success')
             return redirect(url_for('lista_reservas'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Erro ao processar reserva: {str(e)}', 'error')
+            return redirect(url_for('reservar'))
 
         except Exception as e:
             flash(f'Erro ao processar reserva: {str(e)}', 'error')
@@ -231,10 +264,42 @@ def cancelar_reserva(id):
         flash('Você não tem permissão para cancelar esta reserva.', 'error')
         return redirect(url_for('lista_reservas'))
 
-    db.session.delete(reserva)
+    tipo_cancelamento = request.args.get('tipo', 'unica') # 'unica' ou 'serie'
+    
+    if tipo_cancelamento == 'serie' and reserva.recorrencia_id:
+        reservas_serie = Reserva.query.filter_by(recorrencia_id=reserva.recorrencia_id).all()
+        contagem = len(reservas_serie)
+        for r in reservas_serie:
+            db.session.delete(r)
+        flash(f'Série de {contagem} reservas cancelada com sucesso.', 'success')
+    else:
+        db.session.delete(reserva)
+        flash('Reserva cancelada com sucesso.', 'success')
+    
     db.session.commit()
-    flash('Reserva cancelada com sucesso.', 'success')
     return redirect(url_for('lista_reservas'))
+
+@app.route('/alterar-senha', methods=['GET', 'POST'])
+@login_required
+def alterar_senha():
+    if request.method == 'POST':
+        senha_atual = request.form.get('senha_atual')
+        nova_senha = request.form.get('nova_senha')
+        confirmacao = request.form.get('confirmacao')
+        
+        if not current_user.check_senha(senha_atual):
+            flash('Senha atual incorreta.', 'error')
+        elif nova_senha != confirmacao:
+            flash('As novas senhas não coincidem.', 'error')
+        elif len(nova_senha) < 6:
+            flash('A nova senha deve ter pelo menos 6 caracteres.', 'error')
+        else:
+            current_user.set_senha(nova_senha)
+            db.session.commit()
+            flash('Senha alterada com sucesso!', 'success')
+            return redirect(url_for('dashboard'))
+            
+    return render_template('alterar_senha.html')
 
 @app.route('/usuarios', methods=['GET', 'POST'])
 @login_required
