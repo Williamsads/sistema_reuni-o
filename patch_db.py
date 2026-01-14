@@ -1,4 +1,7 @@
-from app import app, db
+from app import create_app, db
+from sqlalchemy import text
+
+app = create_app()
 from sqlalchemy import text
 
 def patch_database():
