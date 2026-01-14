@@ -16,7 +16,7 @@ def gerenciar_usuarios():
         if action == 'create':
             username = request.form.get('username')
             password = request.form.get('password')
-            is_admin = request.form.get('is_admin') == 'on'
+            is_admin = request.form.get('is_admin') == 'true'
             
             if Usuario.query.filter_by(username=username).first():
                 flash('Nome de usuário já existe.', 'error')
@@ -72,10 +72,10 @@ def gerenciar_salas():
 @login_required
 @admin_required
 def reordenar_salas():
-    order_data = request.json.get('ordem')
-    for item in order_data:
-        sala = Sala.query.get(item['id'])
+    order_ids = request.json.get('ordem', [])
+    for index, sala_id in enumerate(order_ids):
+        sala = Sala.query.get(sala_id)
         if sala:
-            sala.ordem = item['ordem']
+            sala.ordem = index
     db.session.commit()
     return {'status': 'success'}, 200
