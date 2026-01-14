@@ -22,12 +22,19 @@
 
         <!-- Status Badge (Absolute Top Right) -->
         <div class="absolute top-6 right-6 flex items-center gap-2">
-            <span class="relative flex h-3 w-3">
+            <span class="relative flex h-4 w-4">
                 {% if sala.ocupada %}
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                <!-- Camada externa de pulsação -->
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                <!-- Camada intermediária de pulsação -->
+                <span
+                    class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-50"></span>
+                <!-- Bolinha central sólida -->
+                <span
+                    class="relative inline-flex rounded-full h-4 w-4 bg-red-500 shadow-lg shadow-red-500/50 blink-red"></span>
                 {% else %}
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                <span
+                    class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 shadow-md shadow-emerald-500/30"></span>
                 {% endif %}
             </span>
             <span class="text-xs font-bold uppercase tracking-wider

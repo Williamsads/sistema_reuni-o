@@ -53,6 +53,27 @@
                 transform: translateY(0);
             }
         }
+
+        /* Animação customizada para bolinha vermelha piscando */
+        .blink-red {
+            animation: blinkRed 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blinkRed {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+            }
+        }
     </style>
 </head>
 
@@ -381,10 +402,12 @@
             <div class="flex items-center gap-4">
                 <span>Versão 1.5.0</span>
                 <span class="text-slate-200">|</span>
-                <a href="https://github.com/Williams-Sobrinho/sistema_agendamento" target="_blank"
-                    class="flex items-center gap-1.5 hover:text-primary transition-colors group">
+                <a href="https://github.com/Williamsads/sistema_agendamento" target="_blank"
+                    class="flex items-center gap-1.5 hover:text-primary transition-colors group"
+                    title="Ver código fonte no GitHub">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round">
+                        stroke-linecap="round" stroke-linejoin="round"
+                        class="group-hover:scale-110 transition-transform">
                         <path
                             d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
                         </path>

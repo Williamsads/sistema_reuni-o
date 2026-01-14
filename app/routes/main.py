@@ -23,13 +23,13 @@ def dashboard():
             Reserva.fim >= agora
         ).first()
         
-        status = 'Disponível'
-        if reserva_atual:
-            status = 'Ocupada'
+        ocupada = reserva_atual is not None
+        status = 'Ocupada' if ocupada else 'Disponível'
             
         status_salas.append({
             'sala': sala,
             'status': status,
+            'ocupada': ocupada,
             'reserva': reserva_atual
         })
 
