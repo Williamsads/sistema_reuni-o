@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.models import db, Usuario, Sala
 from app.utils.decorators import admin_required
 from werkzeug.security import generate_password_hash
@@ -42,8 +42,11 @@ def gerenciar_usuarios():
                     usuario.username = username
                     if password: # Só muda senha se preencher
                         usuario.set_senha(password)
+                    
+                    # Permite trocar permissão de outros usuários, mas não a própria (evita lock-out)
                     if usuario.id != current_user.id:
                         usuario.is_admin = is_admin
+                        
                     db.session.commit()
                     flash('Usuário atualizado com sucesso!', 'success')
                 
@@ -54,15 +57,6 @@ def gerenciar_usuarios():
                 db.session.delete(usuario)
                 db.session.commit()
                 flash('Usuário removido com sucesso!', 'success')
-                
-        elif action == 'toggle_admin':
-            user_id = request.form.get('user_id')
-            usuario = Usuario.query.get(user_id)
-            if usuario and usuario.id != current_user.id:
-                usuario.is_admin = not usuario.is_admin
-                db.session.commit()
-                nivel = "Administrador" if usuario.is_admin else "Usuário Padrão"
-                flash(f'Permissão de {usuario.username} alterada para {nivel}.', 'success')
                 
     usuarios = Usuario.query.all()
     return render_template('usuarios.html', usuarios=usuarios)
